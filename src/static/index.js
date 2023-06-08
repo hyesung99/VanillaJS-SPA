@@ -1,23 +1,37 @@
+import Home from "./views/home.js";
+import MyPage from "./views/myPage.js";
+import Settings from "./views/settings.js";
+
 const router = async () => {
   const routes = [
-    { path: "/", view: () => console.log("to Home")},
-    { path: "/myPage", view: () => console.log("to my page")},
-    { path: "/settings", view: () => console.log("to settings")},
+    { path: "/", view: Home},
+    { path: "/myPage", view: MyPage},
+    { path: "/settings", view: Settings},
   ]
   
-  // default는 홈으로;
-  let url = '/';
+  // default는 홈으로
+  let current_view = routes[0].view;
 
   for(const route of routes){
     if(location.pathname === route.path){
-      url = route.path;
-      console.log(route);
+      current_view = route.view;
       break;
     }
   }
-
-  history.pushState(null, null, url);
+  console.log('current view',current_view.getHtml());
+  document.querySelector('#app').innerHTML = await current_view.getHtml();
 }
-
-document.addEventListener("DOMContentLoaded", router());
+window.addEventListener("popstate", () => {
+  console.log('popstate');
+  router();
+});
+document.addEventListener("DOMContentLoaded", () => {
+  console.log('DOMContentLoaded');
+  document.body.addEventListener('click', e => {
+    e.preventDefault();
+    history.pushState(null, null, e.target.href);
+    console.log('pushState', e.target.href);
+    router();
+  })
+});
 
